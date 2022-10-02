@@ -6,10 +6,10 @@ This repository collects/links projects related to text sentiment analysis, as w
 
 [![Unfinished](https://img.shields.io/badge/status-unfinished-orange)](https://shields.io/#your-badge)
 
-- This is a document for my future self.
 - This is an on-going project; I will extend the content as far as I have time for it.
 - In some cases, I will use the code from other public tutorials/posts rightfully citing the source.
 - In addition to the examples, the links in the section [Interesting Links](#interesting-links) are very useful resources for those interested in the topic.
+- This is a document for my future self.
 
 ## Introduction
 
