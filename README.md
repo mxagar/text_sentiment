@@ -1,6 +1,6 @@
 # Text Sentiment Analysis: A Collection of Notes and Examples
 
-This repository collects/links projects related to text sentiment analysis, as well as some high level notes on the techniques used in the field.
+This repository collects/links projects related to text **sentiment analysis**, as well as some high level notes on the techniques used in the field, always focusing on **supervised text classification**.
 
 :warning: Important notes, first of all:
 
@@ -14,10 +14,10 @@ This repository collects/links projects related to text sentiment analysis, as w
 
 The techniques used in [sentiment analysis](https://en.wikipedia.org/wiki/Sentiment_analysis) are able to efficiently condense raw sequences of words to one valuable scalar which covers the spectrum from `negative` to `positive` (or an equivalent one). Then, that scalar can become an important feature in more complex models that output important business predictions. In my personal experience, that mapping from a text string to a number is very handy in plenty of businesses that work with tabular datasets that contain free text fields.
 
-This repository serves two purposes related to the topic of **sentiment analysis**:
+This repository serves two purposes regarding the topic of **sentiment analysis** and related (supervised) **text classification** problems:
 
 1. This is a document for my future self which collects techniques that I come across.
-2. I present a primer on the basics of Natural Language Processing (NLP) for pragmatic engineers that specialize on other fields, but the Universe gifts them with valuable text data.
+2. I present a primer on the basics of Natural Language Processing (NLP) for pragmatic engineers that specialize on other fields, but the Universe gifts them with valuable text data that needs to be classified.
 
 Overview of Contents:
 
@@ -30,7 +30,7 @@ Overview of Contents:
     - [Preprocessing with SpaCy](#preprocessing-with-spacy)
     - [Beyond the Vocabulary: Word Vectors, Bags and Sequences](#beyond-the-vocabulary-word-vectors-bags-and-sequences)
     - [Vectorization with Scikit-Learn](#vectorization-with-scikit-learn)
-    - [Sentiment Analysis: A Binary Classification Problem](#sentiment-analysis-a-binary-classification-problem)
+    - [Sentiment Analysis: A Classification Problem](#sentiment-analysis-a-classification-problem)
   - [Recurrent Neural Networks: General Notes](#recurrent-neural-networks-general-notes)
     - [Quick Usage Examples of LSTMs in Pytorch](#quick-usage-examples-of-lstms-in-pytorch)
   - [List of Examples + Description Points](#list-of-examples--description-points)
@@ -81,7 +81,7 @@ This section introduces very briefly the most essential tasks carried out for te
 
 Raw text needs to be processed to transform words into numerical vectors. The following image summarizes usual steps that are performed to that end.
 
-IMAGE
+![NLP Prepsocessing](./assets/NLP_Preprocessing.png)
 
 First, the text string needs to be properly split into basic units of meaning or **tokens**, i.e., we perform the **tokenization**. A figure from [Spacy: Linguistic Features](https://spacy.io/usage/linguistic-features) gives a good example of that process:
 
@@ -183,7 +183,7 @@ With the vocabulary defined, we can represent each word in two forms:
 
 In a sparse representation, a word is a vector of zeroes except in the index which corresponds to the text form in the vocabulary, where the vector element value is 1.
 
-In a compressed representation we don't have sparse one-hot encoded vectors, but vectors of much smaller sizes that contain float values in all their cells. We can create those vector spaces in different ways; one option is to compress sparse vectors to a latent space (e.g., with an autoencoder):
+In a compressed representation we don't have sparse one-hot encoded vectors, but vectors of much smaller sizes that contain float values in all their cells. We can create those vector spaces in different ways; one option is to compress sparse vectors to a latent space (e.g., with an [autoencoder](https://en.wikipedia.org/wiki/Autoencoder)):
 
 `[0, 1, 0, ..., 0] (n: vocabulary size) -> [0.2, 0.5, ..., 0.1] (m: latent word vector space)`
 
@@ -218,14 +218,14 @@ The TFIDF formulas are as follows (although everything is automatically computed
 
 - $\textrm{idf}(t,D) = \log \frac{N}{| \{d \in D \, : t \in d \} |}$: `log (total documents N / documents which contain term t)`
 
-Sequences of word vectors are typically used with neural networks, either Recurrent Neural Networks (RNN) or Transformers.
+Sequences of word vectors are typically used with neural networks, either in (1) [**Recurrent Neural Networks**](https://en.wikipedia.org/wiki/Recurrent_neural_network) (RNN) or (2) [Transformers](https://en.wikipedia.org/wiki/Transformer_(machine_learning_model)). The section [Recurrent Neural Networks](#recurrent-neural-networks-general-notes) introduces briefly how the former work and focuses on their application for text and NLP.
 
 ### Vectorization with Scikit-Learn
 
 In the following, a very simple text vectorization snippet is shown with [Scikit-Learn](https://scikit-learn.org/stable/); in it, texts are vectorized as bags of words. Note that:
 
-- Texts are transformed into feature vectors stacked in the rows, as it is always done with the `X` matrix in other cases.
-- We don't need to create any vocabulary with this approach, it is done automatically.
+- Texts are transformed into feature vectors and stacked in rows, as it is usually done with the `X` matrix in other tabular datasets.
+- **We don't need to create any vocabulary with this approach**, it is done automatically.
 - We can use the produced `X_train_tfidf` in any classifier!
 
 ```python
@@ -234,13 +234,15 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-df = pd.read_csv('./data/sms_spam.csv')
-# label: 1 (spam) / 0 (not spam)
-# message: SMS texts that can be spam
+df = pd.read_csv('./data/reviews.csv')
+# shape: (3733, 2)
+# columns:
+# - label: 1 (positive) / 0 (negative)
+# - review: reviews that can be positive or negative
 
 from sklearn.model_selection import train_test_split
 
-X = df['message']
+X = df['review']
 y = df['label']
 
 X_train, X_test, y_train, y_test = train_test_split(X,
@@ -257,7 +259,28 @@ X_train_tfidf = tfidf_vect.fit_transform(X_train)
 X_train_tfidf.shape # (3733, 7082)
 ```
 
-### Sentiment Analysis: A Binary Classification Problem
+### Sentiment Analysis: A Classification Problem
+
+Once the text is vectorized either as bags of words or as sequences of vectors, 
+
+```python
+from sklearn.svm import LinearSVC
+
+clf = LinearSVC()
+clf.fit(X_train_tfidf, y_train)
+
+X_test_tfidf = tfidf_vect.transform(X_test)
+
+probs = clf.predict_proba(X_test_tfidf)
+preds = clf.predict(X_test_tfidf)
+```
+
+Note that we could easily transform the sentiment analysis problem into other types of applications if the dataset is appropriate (i.e., we have the necessary information):
+
+- Any kind of binary classification, e.g., spam vs. not spam.
+- Any kind of multi-class classification, e.g., topic of theme classification (if the labels contain topic annotations).
+
+
 
 ## Recurrent Neural Networks: General Notes
 
