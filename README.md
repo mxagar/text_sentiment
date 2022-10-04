@@ -14,6 +14,8 @@ This repository collects/links projects related to text **sentiment analysis**, 
 
 The techniques used in [sentiment analysis](https://en.wikipedia.org/wiki/Sentiment_analysis) are able to efficiently condense raw sequences of words to one valuable scalar which covers the spectrum from `negative` to `positive` (or an equivalent one). Then, that scalar can become an important feature in more complex models that output important business predictions. In my personal experience, that mapping from a text string to a number is very handy in plenty of businesses that work with tabular datasets that contain free text fields.
 
+Note that text sentiment analysis is a text classification problem; as such, we can re-use some of the techniques to perform supervised topic inference with multiple classes (i.e., text themes). However, sentiment analysis has particular characteristics, such as the possibility of having *sarcasm*, which make it more challenging and specific.
+
 This repository serves two purposes regarding the topic of **sentiment analysis** and related (supervised) **text classification** problems:
 
 1. This is a document for my future self which collects techniques that I come across.
@@ -109,25 +111,36 @@ Even though the preprocessing might seem a lot of effort, I've seen quite often 
 
 1. Remove punctuation: `replace()` with `''` any character contained in the `string.punctuation` module.
 2. Quick and dirty tokenization, i.e., basically split text strings: `text.lower().split()`.
-3. Create a vocabulary with a `set()` and a `dict()`.
+3. Create a vocabulary using a `Counter()`, a `set()` and a `dict()`.
 
 ```python
-# ...
+from string import punctuation # '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+from collections import Counter
+
 text =  """This story is about surfing.
         Catching waves is fun!
-        Surfing is a popular water sport.
+        Surfing's a popular water sport.
         """
-# Build vocabulary (dictionary)
-vocab = {}
-x = text.lower().split()
-for word in x:
-    if word in vocab:
-        continue
-    else:
-        vocab[word]=i
-        i+=1
-# Vocabulary size
-n = len(vocab)
+
+# Remove punctuation
+for char in punctuation:
+    text = text.replace(char, "")
+
+# Count word appearances
+word_counts = Counter()
+for word in text.lower().split(): # split removing white spaces, \n, etc.
+    word_counts[word] += 1
+
+# Index -> Word (Vocabulary)
+index2word = list(set(word_counts.keys()))
+
+# Word -> Index
+word2index = {}
+for i,word in enumerate(index2word):
+    word2index[word] = i
+
+# Vocabulary size: number of words
+n = len(index2word)
 ```
 
 However, if you'd like to squeeze the maximum amount of information from the text, you can have a look at the next section, which summarizes how to easily perform all the preprocessing steps I mentioned using [SpaCy](https://spacy.io/usage).
@@ -280,7 +293,7 @@ Note that we could easily transform the sentiment analysis problem into other ty
 - Any kind of binary classification, e.g., spam vs. not spam.
 - Any kind of multi-class classification, e.g., topic of theme classification (if the labels contain topic annotations).
 
-
+However, bear in mind that sentiment analysis has the additional difficulty of possible uses of irony and sarcasm.
 
 ## Recurrent Neural Networks: General Notes
 
@@ -291,6 +304,18 @@ Note that we could easily transform the sentiment analysis problem into other ty
 ## List of Examples + Description Points
 
 :construction: To be done.
+
+- [NLTK VADER](https://github.com/mxagar/nlp_guide/blob/main/05_Semantics_Sentiment_Analysis/02_Sentiment_Analysis.ipynb)
+  - [VADER](https://www.nltk.org/_modules/nltk/sentiment/vader.html) = Valence Aware Dictionary for sEntiment Reasoning.
+  - We can apply VADER directly to unlabelled text data to obtain the strength of the sentiment in 3 different directions: positive, neutral and negative; all 3 are also compounded to a 4th value.
+  - VADER maps lexical features to sentiment scores; the sentiment score of a text is the sum of the sentiment score of each word.
+  - Negation is understood.
+  - Exclamation marks, capitals, are taken into account.
+  - Sarcasm is not captured.
+  - The VADER model is already prepared for us, we don't need to have a labelled dataset not training.
+  - The performance is not that good though: 60%-70% accuracy.
+- [Sentiment Analysis Neural Network with Numpy](https://github.com/mxagar/deep-learning-v2-pytorch/tree/master/sentiment-analysis-network)
+- [Sentiment Analysis RNN using LSTM cells with Pytorch](https://github.com/mxagar/deep-learning-v2-pytorch/tree/master/sentiment-rnn)
 
 ## Improvements, Next Steps
 
