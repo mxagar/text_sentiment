@@ -75,8 +75,6 @@ pip install -r requirements.txt
 
 ## Natural Language Processing Pipeline: General Notes
 
-:construction: To be done.
-
 This section introduces very briefly the most essential tasks carried out for text preprocessing; if you require more information, you can check [my NLP Guide](https://github.com/mxagar/nlp_guide).
 
 ### Preprocessing
@@ -127,6 +125,8 @@ for char in punctuation:
     text = text.replace(char, "")
 
 # Count word appearances
+# We can do that for each class/sentiment
+# and then compute the ratios for each word!
 word_counts = Counter()
 for word in text.lower().split(): # split removing white spaces, \n, etc.
     word_counts[word] += 1
@@ -359,6 +359,10 @@ All 3 inputs are used in the cell in **4 different and interconnected gates** to
 
 In summary, the LSTM cell is able to capture the context and the recent items in the fed sequences applying several mappings via four gates internally. A key aspect of the cell is that **it is differentiable**, so we can apply backpropagation and optimize the parameters to minimize the error.
 
+An alternative to LSTMs are the **Gated Recurrent Units (GRUs)**, which appeared later. They simplify the recurrent cell while achieving similar performances.
+
+For more information, see: [Gated Recurrent Units (GRU)](http://www.cs.toronto.edu/~guerzhoy/321/lec/W09/rnn_gated.pdf).
+
 ### Defining an LSTM cell in Pytorch
 
 In the following example, the basic usage of an LSTM cell in Pytorch is shown. Input vectors of 4 items map to output vectors of 3 items with one cell. We can pass sequences of vectors, i.e., several vectors arranged in a tensor. One vector can be a word after being transformed into an embedding.
@@ -435,13 +439,11 @@ output, (h1, c1) = lstm(inputs, (h0, c0))
 # c1: [1, 1, 3]
 ```
 
-
 ## List of Examples + Description Points
-
-:construction: To be done.
 
 - [NLTK VADER](https://github.com/mxagar/nlp_guide/blob/main/05_Semantics_Sentiment_Analysis/02_Sentiment_Analysis.ipynb)
   - [VADER](https://www.nltk.org/_modules/nltk/sentiment/vader.html) = Valence Aware Dictionary for sEntiment Reasoning.
+  - Amazon reviews analyzed.
   - We can apply VADER directly to unlabelled text data to obtain the strength of the sentiment in 3 different directions: positive, neutral and negative; all 3 are also compounded to a 4th value.
   - VADER maps lexical features to sentiment scores; the sentiment score of a text is the sum of the sentiment score of each word.
   - Negation is understood.
@@ -450,20 +452,55 @@ output, (h1, c1) = lstm(inputs, (h0, c0))
   - The VADER model is already prepared for us, we don't need to have a labelled dataset not training.
   - The performance is not that good though: 60%-70% accuracy.
 - [Sentiment Analysis Neural Network with Numpy](https://github.com/mxagar/deep-learning-v2-pytorch/tree/master/sentiment-analysis-network)
+  - A sentiment analysis network is created from scratch with Numpy.
+  - Movie reviews analyzed.
+  - Word ratios in positive and negative reviews are computed.
+  - Words are encoded as one-hot vectors:
+    - First input is word count in review
+    - Then, better just appearance (because it works better - less noise)
+  - Network class is defined by class:
+    - input: vocabulary size
+    - hidden: parameter (10)
+    - output: 1
+  - All necessary functions are programmed: train, test, etc.
+  - Network functions are optimized for efficiency in their programming.
+  - The most similar words are found with the dot product of the columns/rows of the first weight matrix.
 - [Sentiment Analysis RNN using LSTM cells with Pytorch](https://github.com/mxagar/deep-learning-v2-pytorch/tree/master/sentiment-rnn)
+  - This notebook improves the basic sentiment analysis model network without RNNs: [Sentiment Analysis Neural Network with Numpy](https://github.com/mxagar/deep-learning-v2-pytorch/tree/master/sentiment-analysis-network).
+  - The network receives a batch of reviews. Reviews are tokenized and encoded as integers. The sequence length (number of words per review) is fixed: 200; thus, we either truncate the texts if longer or pad them with 0s on the left.
+  - The trained network is able to yield a value 0-1 which denotes the positive (1) or negative (0) sentiment of any text.
+  - The efficiency I got with the test split was 96.8%; that's very high!
+  - Steps:
+    - Load data and pre-process it:
+    	- punctuation is removed,
+    	- words are tokenized with `split()`
+    	- a vocabulary dictionary is built
+    	- tokens are encoded as integers
+    	- outliers are removed (reviews with length 0)
+    	- encoded reviews are converted to a fixed sequence length with truncation or left zero padding
+    - Training, validation and test splits are created
+    - Data loaders
+    - Model definition: Embedding, LSTM, Linear, Dropout, Sigmoid
+    - Training
+    - Saving and loading model
+    - Testing
+    - Inference / Prediction function
 
 ## Improvements, Next Steps
 
-:construction: To be done.
+- [ ] Compare RNN against best classifier (e.g., XGBoost) in the context of sentiment analysis.
+- [ ] Apply `GridSearchCV` to find the best hyperparameters for the Sentiment Analysis RNN using [skorch](https://github.com/skorch-dev/skorch).
 
 ## Interesting Links
 
 - [My notes and code](https://github.com/mxagar/deep_learning_udacity) on the [Udacity Deep Learning Nanodegree](https://www.udacity.com/course/deep-learning-nanodegree--nd101).
+- More examples with RNNs using Pytorch: [Pytorch Guide](https://github.com/mxagar/deep_learning_udacity/blob/main/02_Pytorch_Guide/DL_Pytorch_Guide.md) (Section "Recursive Neural Networks").
 - [NLP Guide](https://github.com/mxagar/nlp_guide).
 - [Emotion Classification](https://en.wikipedia.org/wiki/Emotion_classification).
 - [Understanding LSTM Networks, by Chris Olah](http://colah.github.io/posts/2015-08-Understanding-LSTMs/)
 - [Exploring LSTMs, by Edwin Chen](http://blog.echen.me/2017/05/30/exploring-lstms/)
 - [Karpathy's Lecture: Recurrent Neural Networks, Image Captioning, LSTM](https://www.youtube.com/watch?v=iX5V1WpxxkY)
+- [Skorch: A Scikit-Learn Wrapper for Pytorch](https://github.com/skorch-dev/skorch): Use Pytorch classifiers in `Pipeline` or `GridSearchCV`.
 
 ## Authorship
 
