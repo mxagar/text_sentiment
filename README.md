@@ -107,7 +107,7 @@ And finally, the **vocabulary** is built. This is an object which collects all p
 
 Even though the preprocessing might seem a lot of effort, I've seen quite often to reduce the work to this **simplified recipe**:
 
-1. Remove punctuation: `replace()` with `''` any character contained in the `string.punctuation` module.
+1. Remove punctuation if punctuation symbols do not contain meaning for the application: `replace()` with `''` any character contained in the `string.punctuation` module.
 2. Quick and dirty tokenization, i.e., basically split text strings: `text.lower().split()`.
 3. Create a vocabulary using a `Counter()`, a `set()` and a `dict()`.
 
@@ -143,7 +143,32 @@ for i,word in enumerate(index2word):
 n = len(index2word)
 ```
 
-However, if you'd like to squeeze the maximum amount of information from the text, you can have a look at the next section, which summarizes how to easily perform all the preprocessing steps I mentioned using [SpaCy](https://spacy.io/usage).
+However, if the punctuation symbols contain meaning for the application and we require more sophisticated tokenization, we can use the [SpaCy](https://spacy.io/) or [NLTK](https://www.nltk.org/) libraries, as shown:
+
+```python
+# Built-in string split: it separates in white spaces by default
+text = "Dr. Smith arrived late."
+word = text.split() # ['Dr.', 'Smith', 'arrived', 'late.']
+
+# NLTK: More meaningful word tokenization
+from nlt.tokenize import word_tokenize
+words = word_tokenize(text) # ['Dr.', 'Smith', 'arrived', 'late', '.']
+
+# NLTK: Sentence splits or tokenization
+from nlt.tokenize import sent_tokenize
+text = "Dr. Smith arrived late. However, the conference hadn't started yet."
+words = sent_tokenize(text)
+# ['Dr. Smith arrived late.',
+#  'However, the conference hadn't started yet.']
+
+# SpaCy: More meaningful word tokenization
+import spacy
+nlp = spacy.load('en_core_web_sm')
+doc = nlp(text)
+words = [token.text for token in doc]
+```
+
+Finally, if you'd like to squeeze the maximum amount of information from the text, you can have a look at the next section, which summarizes how to easily perform all the preprocessing steps I mentioned using [SpaCy](https://spacy.io/usage).
 
 ### Preprocessing with SpaCy
 
