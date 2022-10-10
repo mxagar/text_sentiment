@@ -396,6 +396,7 @@ Notes:
 
 - `nn.LSTM` is more like a layer than a neuron, as happens with `nn.RNN`; its equivalent would be `nn.Linear`. Additionally, `nn.LSTM` can have several layers inside.
 - We can pass one vector after the another in a loop. However, it's more efficient to pass several vectors together in a tensor. Note this is not a batch - a batch would be another grouping on top of that. It is rather a sequence. If a vector is a word, it would be a sentence!
+- When we input a sequence, we get as output a sequence of the same length; the output sequence is composed of hidden memory state vectors. The size of a hidden state vector doesn't need to be the same as the size of an input vector.
 
 ```python
 import torch
@@ -518,6 +519,7 @@ output, (h1, c1) = lstm(inputs, (h0, c0))
 
 ## Interesting Links
 
+- My blog post on [text generation RNNs](https://mikelsagardia.io/blog/text-generation-rnn.html).
 - [My notes and code](https://github.com/mxagar/deep_learning_udacity) on the [Udacity Deep Learning Nanodegree](https://www.udacity.com/course/deep-learning-nanodegree--nd101).
 - More examples with RNNs using Pytorch: [Pytorch Guide](https://github.com/mxagar/deep_learning_udacity/blob/main/02_Pytorch_Guide/DL_Pytorch_Guide.md) (Section "Recursive Neural Networks").
 - [NLP Guide](https://github.com/mxagar/nlp_guide).
