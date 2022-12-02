@@ -523,6 +523,7 @@ output, (h1, c1) = lstm(inputs, (h0, c0))
 - [My notes and code](https://github.com/mxagar/deep_learning_udacity) on the [Udacity Deep Learning Nanodegree](https://www.udacity.com/course/deep-learning-nanodegree--nd101).
 - More examples with RNNs using Pytorch: [Pytorch Guide](https://github.com/mxagar/deep_learning_udacity/blob/main/02_Pytorch_Guide/DL_Pytorch_Guide.md) (Section "Recursive Neural Networks").
 - [NLP Guide](https://github.com/mxagar/nlp_guide).
+- [Sentiment Analysis RNN Deployed Using AWS SageMaker](https://github.com/mxagar/sentiment_rnn_aws_deployment).
 - [Emotion Classification](https://en.wikipedia.org/wiki/Emotion_classification).
 - [Understanding LSTM Networks, by Chris Olah](http://colah.github.io/posts/2015-08-Understanding-LSTMs/)
 - [Exploring LSTMs, by Edwin Chen](http://blog.echen.me/2017/05/30/exploring-lstms/)
