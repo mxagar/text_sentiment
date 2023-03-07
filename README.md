@@ -235,8 +235,8 @@ Word vector similarities can be measured with their cosine similarity.
 
 On the other hand, texts formed by words can be represented in the following general forms:
 
-1. As **bags of words** (one-hot encoded).
-2. As **sequences of word vectors** (usually compressed vectors).
+1. As **bags of words** (one-hot encoded): these are document-level representations, useful for models in which we want to predict properties of each document, e.g., whether it's spam or the sentiment.
+2. As **sequences of word vectors** (usually compressed vectors): these are word-level representations, useful for models in which we predict words, i.e., text generation.
 
 The bag of words representation does not take into account the order in which the words appear in the text; with it we create a **Document Term Matrix** (DTM) of size `N x n`, being `N` the number of documents/texts and `n` the size of the vocabulary. In the cells of the DTM we can have:
 
